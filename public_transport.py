@@ -1,7 +1,9 @@
 from datetime import datetime
+import redis
 
 import requests
-
+from json import dumps,loads
+r=redis.Redis()
 
 def get_departures(station_id: int, directions: list[str] = [], departures_per_direction=1) -> dict[str, list]:
     """
@@ -26,14 +28,17 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
             if len(departures[direction]) < departures_per_direction:
                 departures[direction].append(
                         {
+                            "line":departure["Linienname"],
                             "typ": departure["Produkt"],
-                            "time": (time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z")),
-                            "delay": datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time,
+                            "time": str((time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z"))),
+                            "delay": str(datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time),
                         }
                 )
-
+    r.set("public_transport", dumps(departures))
     return departures
 
 
 if __name__ == '__main__':
-    get_departures(335, ['Erlenstegen', 'Doku-Zentrum'])
+    print(get_departures(335 ))#['Erlenstegen', 'Doku-Zentrum']
+    print(loads(r.get("public_transport")))
+
