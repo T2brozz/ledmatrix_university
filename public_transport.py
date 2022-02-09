@@ -1,9 +1,11 @@
 from datetime import datetime
-import redis
+from json import dumps, loads
 
+import redis
 import requests
-from json import dumps,loads
-r=redis.Redis()
+
+r = redis.Redis()
+
 
 def get_departures(station_id: int, directions: list[str] = [], departures_per_direction=1) -> dict[str, list]:
     """
@@ -17,6 +19,14 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
 
     rq = requests.get(f"https://start.vag.de/dm/api/v1/abfahrten/VGN/{station_id}")
     if rq.status_code != 200:
+        r.set("public_transport", dumps(
+                {str("Error" + str(rq.status_code)): [{
+                    "line": "0",
+                    "typ": "None",
+                    "time": "0:00:00",
+                    "delay": "0:00:00",
+                }]}
+        ))
         raise ConnectionError
     result = rq.json()["Abfahrten"]
 
@@ -28,9 +38,10 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
             if len(departures[direction]) < departures_per_direction:
                 departures[direction].append(
                         {
-                            "line":departure["Linienname"],
+                            "line": departure["Linienname"],
                             "typ": departure["Produkt"],
-                            "time": str((time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z"))),
+                            "time": str(
+                                    (time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z"))),
                             "delay": str(datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time),
                         }
                 )
@@ -39,6 +50,5 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
 
 
 if __name__ == '__main__':
-    print(get_departures(335 ))#['Erlenstegen', 'Doku-Zentrum']
+    print(get_departures(335))  # ['Erlenstegen', 'Doku-Zentrum']
     print(loads(r.get("public_transport")))
-
