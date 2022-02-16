@@ -71,16 +71,14 @@ def custom_text(name_offsets):
 
 
 def autoonoff():
-    dayname = datetime.strftime(datetime.now(), "%A")
-    on = time.fromisoformat(loads(r.get("on")).get(dayname))
-    off = time.fromisoformat(loads(r.get("off")).get(dayname))
+    dayName = datetime.strftime(datetime.now(), "%A")
+    on = time.fromisoformat(loads(r.get("on")).get(dayName))
+    off = time.fromisoformat(loads(r.get("off")).get(dayName))
     if off <= on:
         return False
     if on <= datetime.now().time() <= off:
         return True
     return False
-    # on ={day:datetime.time.fromisoformat(ontime) for day,ontime in  loads(r.get("on")).items()}
-    # off ={day:datetime.time.fromisoformat(offtime) for day,offtime in  loads(r.get("offtime")).items()}
 
 
 def start_matrix():
