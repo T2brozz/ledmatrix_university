@@ -13,10 +13,12 @@ def api_start():
 
 
 def crawl_data():
-    c = 60
+    c = 0
     while True:
         c += 1
-        public_transport.start()
+        if c % 5 == 0:
+            public_transport.start()
+
         if c >= 60:
             mensa.start()
             c=0
