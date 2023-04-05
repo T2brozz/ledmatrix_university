@@ -8,6 +8,8 @@ from time import sleep
 import redis
 from rgbmatrix import RGBMatrix, RGBMatrixOptions, graphics
 
+from startup import start_everything
+
 canvas = None
 font = graphics.Font()
 font.LoadFont("/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf")
@@ -16,7 +18,7 @@ textColor = graphics.Color(255, 255, 255)
 r = redis.Redis()
 scroll_speed = 1
 refreshrate = 60
-next_module = {"mensa": False, "custom": False, "custom_timer": 20 * refreshrate, "vgn": 20 * refreshrate}
+next_module = {"mensa": False, "custom": False, "custom_timer": 20 * refreshrate, "vgn": 10 * refreshrate}
 
 
 def render_vgn():
@@ -39,7 +41,7 @@ def render_mensa(name_offset):
         next_module["mensa"] = True
     for i, meal in enumerate(json):
         graphics.DrawText(canvas, font, name_offset, font.height * (i + 1), graphics.Color(30, 129, 176),
-                          (meal['name'] + "  *|*  ") * 10)
+                          (meal['name'] + "  ***  ") * 10)
         graphics.DrawText(canvas, font, 190, font.height * (i + 1), graphics.Color(0, 0, 0), "███████")
         graphics.DrawText(canvas, font, 200, font.height * (i + 1), textColor, str(meal['price']) + '€')
     name_offset -= scroll_speed
@@ -48,14 +50,18 @@ def render_mensa(name_offset):
 
 def custom_text(name_offsets):
     lines = loads(r.get("lines"))
+    if all(v is None for v in lines):
+        next_module['custom'] = True
     for i, line in enumerate(lines):
-        if name_offsets[i] == -len(line) * 10:
+        if line is None:
+            line = ""
+        elif name_offsets[i] == -len(line) * 10:
             name_offsets[i] = 1
             next_module['custom'] = True
         if line == "":
             name_offsets[i] = 1
             next_module['custom'] = True
-            return
+
 
     for i, line in enumerate(lines):
         graphics.DrawText(canvas, font, name_offsets[i], font.height * (i + 1), textColor, line)
@@ -104,10 +110,10 @@ def start_matrix():
                     render_vgn()
                 else:
                     next_module = {"mensa": False, "custom": False, "custom_timer": 20 * refreshrate,
-                                   "vgn": 20 * refreshrate}
+                                   "vgn": 10 * refreshrate}
 
                 # controls brightness
-                brightness = 50  # int(r.get('brightness'))
+                brightness =  int(r.get('brightness'))
                 if brightness > 0:
                     matrix.brightness = brightness
                     canvas = matrix.SwapOnVSync(canvas)
@@ -125,6 +131,7 @@ def start_matrix():
 
 
 if __name__ == '__main__':
+    start_everything()
     options = RGBMatrixOptions()
     options.rows = 64
     options.cols = 64
@@ -135,6 +142,8 @@ if __name__ == '__main__':
     options.led_rgb_sequence = "RGB"
     options.drop_privileges = False
     options.disable_hardware_pulsing = True
+    options.pixel_mapper_config = "Rotate:180"
+
     # options.show_refresh_rate=True
     # options.limit_refresh_rate_hz = 70
     matrix = RGBMatrix(options=options)

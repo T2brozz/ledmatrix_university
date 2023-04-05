@@ -13,9 +13,9 @@ from pydantic import BaseModel
 r = redis.Redis()
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="templates"), name="static")
+#app.mount("/static", StaticFiles(directory="templates"), name="static")
 
-templates = Jinja2Templates(directory="templates")
+#templates = Jinja2Templates(directory="templates")
 
 
 class TimerAutoOnOff(BaseModel):
@@ -35,7 +35,8 @@ def myconverter(o):
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "id": 40})
+    return 1
+    #return templates.TemplateResponse("index.html", {"request": request, "id": 40})
 
 
 @app.post("/shutdown")
@@ -81,6 +82,5 @@ async def set_display_auto_onoff(on: TimerAutoOnOff, off: TimerAutoOnOff):
 async def get_display_auto_onoff():
     return {'on': loads(r.get("on")), 'off': loads(r.get("off"))}
 
-
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8080, debug=True)
+    uvicorn.run(app, host='0.0.0.0', port=8080, debug=False)

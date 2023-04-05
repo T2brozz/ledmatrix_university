@@ -49,6 +49,12 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
     return departures
 
 
-if __name__ == '__main__':
-    print(get_departures(335))  # ['Erlenstegen', 'Doku-Zentrum']
+def start():
+    get_departures(335)  # ['Erlenstegen', 'Doku-Zentrum']
     print(loads(r.get("public_transport")))
+
+
+if __name__ == '__main__':
+    start()
+    ##print(get_departures(335))  # ['Erlenstegen', 'Doku-Zentrum']
+    ##print(loads(r.get("public_transport")))
