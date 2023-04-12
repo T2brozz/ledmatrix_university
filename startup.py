@@ -14,6 +14,8 @@ def api_start():
 
 def crawl_data():
     c = 0
+    public_transport.start()
+    mensa.start()
     while True:
         c += 1
         if c % 5 == 0:

@@ -37,7 +37,6 @@ def get_mensa(mensa_id: int, day=datetime.date.today().strftime("%G-%m-%d"), men
 
 
 def start():
-    print(str(datetime.date.today().isoformat()))
     get_mensa(269, str(datetime.date.today().isoformat()), mensa_name='HQ')
     print(loads(r.get("canteen")))
 
