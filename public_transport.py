@@ -30,7 +30,7 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
         ))
         raise ConnectionError
     result = rq.json()["Abfahrten"]
-
+    result= sorted(result,key=lambda x: x["AbfahrtszeitSoll"])
     departures = {}
     for departure in result:
         if (direction := departure["Richtungstext"]) in directions or len(directions) == 0:
