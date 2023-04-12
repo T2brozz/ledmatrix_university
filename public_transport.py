@@ -18,6 +18,7 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
     """
 
     rq = requests.get(f"https://start.vag.de/dm/api/v1/abfahrten/VGN/{station_id}")
+    print(rq.json())
     if rq.status_code != 200:
         r.set("public_transport", dumps(
                 {str("Error" + str(rq.status_code)): [{
