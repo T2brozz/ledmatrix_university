@@ -21,17 +21,17 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
     print(rq.json())
     if rq.status_code != 200:
         r.set("public_transport", dumps(
-                {str("Error" + str(rq.status_code)): [{
-                    "line": "0",
-                    "typ": "None",
-                    "time": "0:00:00",
-                    "delay": "0:00:00",
-                }]}
+            {str("Error" + str(rq.status_code)): [{
+                "line": "0",
+                "typ": "None",
+                "time": "0:00:00",
+                "delay": "0:00:00",
+            }]}
         ))
         raise ConnectionError
     result = rq.json()["Abfahrten"]
-    result= sorted(result,key=lambda x: x["AbfahrtszeitSoll"])
-    print(result    )
+    result = sorted(result, key=lambda x: x["AbfahrtszeitSoll"])
+    print(result)
     departures = {}
     for departure in result:
         if (direction := departure["Richtungstext"]) in directions or len(directions) == 0:
@@ -39,14 +39,16 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
                 departures[direction] = []
             if len(departures[direction]) < departures_per_direction:
                 departures[direction].append(
-                        {
-                            "line": departure["Linienname"],
-                            "typ": departure["Produkt"],
-                            "time": str(
-                                    (time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z"))),
-                            "delay": str(datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time),
-                        }
+                    {
+                        "line": departure["Linienname"],
+                        "typ": departure["Produkt"],
+                        "time": str(
+                            (time := datetime.strptime(departure["AbfahrtszeitSoll"], "%Y-%m-%dT%H:%M:%S%z"))),
+                        "delay": str(datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time),
+                    }
                 )
+    print("aaa")
+    print(departures)
     r.set("public_transport", dumps(departures))
     return departures
 
