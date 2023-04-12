@@ -7,18 +7,17 @@ import requests
 r = redis.Redis()
 
 
-def get_departures(station_id: int, directions: list[str] = [], departures_per_direction=1) -> dict[str, list]:
+def get_departures(station_name: int, directions: list[str] = [], departures_per_direction=1) -> dict[str, list]:
     """
     returns for specified direction the departures of an station form the VAG/VGN public transport network
 
-    :param station_id: Vgn id of station/ get it with https://start.vag.de/dm/api/v1/haltestellen/VGN?name=stationname
+    :param station_name: Vgn id of station/ get it with https://start.vag.de/dm/api/v1/haltestellen/VGN?name=stationname
     :param directions: List of direction to prioritize, leave empty for all directions
     :param departures_per_direction: how many departures for each direction
     :return:   dict with a list for each direction
     """
 
-    rq = requests.get(f"https://start.vag.de/dm/api/v1/abfahrten/VGN/{station_id}")
-    print(rq.json())
+    rq = requests.get(f"https://start.vag.de/dm/api/v1/abfahrten/VAG/{station_name}?product=Tram&limitcount=2")
     if rq.status_code != 200:
         r.set("public_transport", dumps(
             {str("Error" + str(rq.status_code)): [{
@@ -31,7 +30,6 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
         raise ConnectionError
     result = rq.json()["Abfahrten"]
     result = sorted(result, key=lambda x: x["AbfahrtszeitSoll"])
-    print(result)
     departures = {}
     for departure in result:
         if (direction := departure["Richtungstext"]) in directions or len(directions) == 0:
@@ -47,14 +45,13 @@ def get_departures(station_id: int, directions: list[str] = [], departures_per_d
                         "delay": str(datetime.strptime(departure["AbfahrtszeitIst"], "%Y-%m-%dT%H:%M:%S%z") - time),
                     }
                 )
-    print("aaa")
-    print(departures)
+
     r.set("public_transport", dumps(departures))
     return departures
 
 
 def start():
-    get_departures(335)  # ['Erlenstegen', 'Doku-Zentrum']
+    get_departures("DEICHS")  # ['Erlenstegen', 'Doku-Zentrum']
     print(loads(r.get("public_transport")))
 
 
