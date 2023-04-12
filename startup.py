@@ -18,7 +18,6 @@ def crawl_data():
         c += 1
         if c % 5 == 0:
             public_transport.start()
-
         if c >= 60:
             mensa.start()
             c=0
