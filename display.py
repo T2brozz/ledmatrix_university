@@ -124,6 +124,8 @@ def start_matrix():
                     sleep(1)
 
             else:
+                matrix.Fill(0, 0, 0)
+                canvas = matrix.SwapOnVSync(canvas)
                 sleep(60)
 
     except KeyboardInterrupt:
