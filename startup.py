@@ -6,6 +6,9 @@ import uvicorn
 import api
 import mensa
 import public_transport
+import redis
+
+r = redis.Redis()
 
 
 def api_start():
@@ -16,9 +19,13 @@ def crawl_data():
     c = 0
     try:
         public_transport.start()
-        mensa.start()
     except:
-        pass
+        r.set("public_transport", '{"Error": [{"line": "0", "typ": "None", "time": "0:00:00", "delay": "0:00:00"}]}')
+
+    try:
+        mensa.start()
+    except Exception as e:
+        r.set("canteen", '[{"canteen": "Error", "name": "Fuckin Error", "price": 1}]')
 
     while True:
         c += 1
@@ -26,12 +33,14 @@ def crawl_data():
             try:
                 public_transport.start()
             except:
-                pass
+                r.set("public_transport",
+                      '{"Error": [{"line": "0", "typ": "None", "time": "0:00:00", "delay": "0:00:00"}]}')
         if c >= 60:
             try:
                 mensa.start()
-            except:
-                pass
+            except Exception as e:
+                r.set("canteen", '[{"canteen": "Error", "name": "Fuckin Error", "price": 1}]')
+
             c = 0
         time.sleep(60)
 

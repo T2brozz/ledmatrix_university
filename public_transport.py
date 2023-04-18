@@ -27,7 +27,7 @@ def get_departures(station_name: int, directions: list[str] = [], departures_per
                 "delay": "0:00:00",
             }]}
         ))
-        raise ConnectionError
+
     result = rq.json()["Abfahrten"]
     result = sorted(result, key=lambda x: x["AbfahrtszeitSoll"])
     departures = {}

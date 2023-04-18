@@ -22,7 +22,7 @@ def get_mensa(mensa_id: int, day=datetime.date.today().strftime("%G-%m-%d"), men
             'name': "Fuckin Error",
             'price': rq.status_code
         }]))
-        raise ConnectionError
+
     result = rq.json()
     meals = []
     for meal in result:
