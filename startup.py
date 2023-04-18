@@ -16,6 +16,7 @@ def api_start():
 
 
 def crawl_data():
+    time.sleep(10)
     c = 0
     try:
         public_transport.start()
