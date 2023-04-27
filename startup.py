@@ -21,12 +21,12 @@ def crawl_data():
     try:
         public_transport.start()
     except:
-        r.set("public_transport", '{"Error": [{"line": "0", "typ": "None", "time": "0:00:00", "delay": "0:00:00"}]}')
+        r.set("public_transport", '{"Error": [{"line": "Hallo ich bin ein VGN Error", "typ": "None", "time": "0:00:00", "delay": "0:00:00"}]}')
 
     try:
         mensa.start()
     except Exception as e:
-        r.set("canteen", '[{"canteen": "Error", "name": "Fuckin Error", "price": 1}]')
+        r.set("canteen", '[{"canteen": "Error", "name": "Hallo ich bin ein Mensa Error", "price": 1}]')
 
     while True:
         c += 1
