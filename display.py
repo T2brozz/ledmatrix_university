@@ -105,9 +105,9 @@ def start_matrix():
                     mensa_name_offset = render_mensa(mensa_name_offset)
                 elif not next_module['custom'] and next_module['custom_timer'] >= 0:
                     customline_offset = custom_text(customline_offset)
-                #elif next_module['vgn'] >= 0:
-                    #next_module["vgn"] -= 1
-                    #render_vgn()
+                elif next_module['vgn'] >= 0:
+                    next_module["vgn"] -= 1
+                    render_vgn()
                 else:
                     next_module = {"mensa": False, "custom": False, "custom_timer": 20 * refreshrate,
                                    "vgn": 10 * refreshrate}
