@@ -36,7 +36,7 @@ def render_mensa(name_offset):
     json = loads(r.get("canteen"))
 
     longest_name = len(max(json, key=lambda x: len(x['name']))["name"]) * 10
-    if name_offset == -longest_name - 65:
+    if name_offset <= -longest_name - 65:
         name_offset = 1
         next_module["mensa"] = True
     for i, meal in enumerate(json):
